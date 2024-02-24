@@ -25,6 +25,15 @@ class MyApp extends StatelessWidget {
       title: "Todo App",
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        textTheme: const TextTheme(
+          titleLarge: TextStyle(
+            fontSize: 40,
+            fontWeight: FontWeight.bold,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 20,
+          ),
+        ),
       ),
       home: const TodoApp(),
     );
@@ -49,6 +58,8 @@ class _TodoAppState extends State<TodoApp> {
       MaterialPageRoute(builder: (context) => const CreateTodoScreen()),
     );
 
+    if (!context.mounted) return;
+
     setState(() {
       todos.add(result);
     });
@@ -58,7 +69,10 @@ class _TodoAppState extends State<TodoApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("ToDo List"),
+        title: Text(
+          "ToDo List",
+          style: Theme.of(context).textTheme.titleLarge!,
+        ),
       ),
 
       // 横にスライドすることでTodoを削除する
@@ -79,8 +93,11 @@ class _TodoAppState extends State<TodoApp> {
             },
             background: Container(color: Colors.red),
             child: ListTile(
-              title: Text(todo.getTitle),
-              //TODO 詳細画面に遷移
+              title: Text(
+                todo.getTitle,
+                style: Theme.of(context).textTheme.bodyMedium!,
+              ),
+              // 詳細画面に遷移
               onTap: () {
                 Navigator.push(
                     context,
@@ -124,7 +141,10 @@ class _CreateTodoScreenState extends State<CreateTodoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create ToDo"),
+        title: Text(
+          "Create ToDo",
+          style: Theme.of(context).textTheme.titleLarge!,
+        ),
       ),
       body: Form(
         key: _formKey,
@@ -203,14 +223,30 @@ class ReadTodoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(todo.getTitle),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text(
-          todo.getDescription,
-          softWrap: true,
+        title: Text(
+          todo.getTitle,
+          style: Theme.of(context).textTheme.titleLarge!,
         ),
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              todo.getDescription,
+              style: Theme.of(context).textTheme.bodyMedium!,
+              softWrap: true,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Return")),
+          ),
+        ],
       ),
     );
   }
