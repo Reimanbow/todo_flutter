@@ -79,9 +79,14 @@ class _TodoAppState extends State<TodoApp> {
             },
             background: Container(color: Colors.red),
             child: ListTile(
-              title: Text("${todo.getTitle}"),
+              title: Text(todo.getTitle),
               //TODO 詳細画面に遷移
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ReadTodoScreen(todo: todo)));
+              },
             ),
           );
         },
@@ -180,6 +185,31 @@ class _TodoTextField extends StatelessWidget {
         decoration: InputDecoration(
           border: const OutlineInputBorder(),
           labelText: label,
+        ),
+      ),
+    );
+  }
+}
+
+class ReadTodoScreen extends StatelessWidget {
+  const ReadTodoScreen({
+    super.key,
+    required this.todo,
+  });
+
+  final Todo todo;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(todo.getTitle),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          todo.getDescription,
+          softWrap: true,
         ),
       ),
     );
