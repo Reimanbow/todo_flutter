@@ -155,10 +155,12 @@ class _CreateTodoScreenState extends State<CreateTodoScreen> {
             _TodoTextField(
               controller: _titleController,
               label: "Title",
+              isMultiline: false,
             ),
             _TodoTextField(
               controller: _descriptionController,
               label: "description",
+              isMultiline: true,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
@@ -185,10 +187,12 @@ class _TodoTextField extends StatelessWidget {
   const _TodoTextField({
     required this.controller,
     required this.label,
+    required this.isMultiline,
   });
 
   final TextEditingController controller;
   final String label;
+  final bool isMultiline;
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +210,8 @@ class _TodoTextField extends StatelessWidget {
           border: const OutlineInputBorder(),
           labelText: label,
         ),
+        keyboardType: isMultiline ? TextInputType.multiline : null,
+        maxLines: isMultiline ? null : 1,
       ),
     );
   }
