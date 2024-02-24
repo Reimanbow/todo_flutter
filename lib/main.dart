@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
       ),
-      home: TodoApp(),
+      home: const TodoApp(),
     );
   }
 }
@@ -42,12 +42,26 @@ class TodoApp extends StatefulWidget {
 class _TodoAppState extends State<TodoApp> {
   List<Todo> todos = [];
 
+  // Todo作成画面に遷移
+  Future<void> _navigateCreateTodoScreen(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateTodoScreen()),
+    );
+
+    setState(() {
+      todos.add(result);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("ToDo List"),
       ),
+
+      // 横にスライドすることでTodoを削除する
       body: ListView.builder(
         itemCount: todos.length,
         itemBuilder: (context, index) {
@@ -59,6 +73,7 @@ class _TodoAppState extends State<TodoApp> {
                 todos.removeAt(index);
               });
 
+              // 削除の通知
               ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("${todo.getTitle} delete")));
             },
@@ -72,10 +87,100 @@ class _TodoAppState extends State<TodoApp> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        //TODO 作成画面に遷移
-        onPressed: () {},
+        // 作成画面に遷移
+        onPressed: () => _navigateCreateTodoScreen(context),
         tooltip: "Create ToDo",
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class CreateTodoScreen extends StatefulWidget {
+  const CreateTodoScreen({super.key});
+
+  @override
+  State<CreateTodoScreen> createState() => _CreateTodoScreenState();
+}
+
+class _CreateTodoScreenState extends State<CreateTodoScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Create ToDo"),
+      ),
+      body: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _TodoTextField(
+              controller: _titleController,
+              label: "Title",
+            ),
+            _TodoTextField(
+              controller: _descriptionController,
+              label: "description",
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    final todo = Todo(
+                        _titleController.text, _descriptionController.text);
+                    Navigator.pop(context, todo);
+                  }
+                },
+                child: const Text("Create"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Todo作成時の入力フィールド
+class _TodoTextField extends StatelessWidget {
+  const _TodoTextField({
+    required this.controller,
+    required this.label,
+  });
+
+  final TextEditingController controller;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: TextFormField(
+        controller: controller,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return "Please Fill $label";
+          }
+          return null;
+        },
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          labelText: label,
+        ),
       ),
     );
   }
